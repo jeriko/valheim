@@ -308,7 +308,125 @@ function App() {
           </p>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-6 mb-6">
+        {/* Battle Section - Now at the top */}
+        <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700 mb-6">
+          <div className="bg-gradient-to-r from-purple-700 via-violet-700 to-indigo-700 px-6 py-4">
+            <h2 className="text-2xl font-bold flex items-center">
+              <ScaleIcon className="w-6 h-6 mr-2" /> Battle Simulation
+            </h2>
+          </div>
+          
+          <div className="p-6">
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-semibold text-purple-300 flex items-center">
+                  <ArrowPathIcon className="w-5 h-5 mr-2" /> Combat Accuracy
+                </h3>
+                <div className="px-3 py-1 bg-purple-800 rounded-full text-sm font-semibold">
+                  {shotsLanded === 0 
+                    ? "Equal" 
+                    : shotsLanded > 0 
+                      ? `+${Math.round(shotsLanded * 100)}% Player` 
+                      : `+${Math.round(Math.abs(shotsLanded) * 100)}% Enemies`}
+                </div>
+              </div>
+              
+              <div className="bg-gray-700 p-4 rounded-lg shadow-inner">
+                <div className="flex items-center mb-2">
+                  <span className="text-sm text-red-400 w-24">Enemy Advantage</span>
+                  <input 
+                    type="range" 
+                    min="-1" 
+                    max="1" 
+                    step="0.1" 
+                    value={shotsLanded}
+                    onChange={(e) => setShotsLanded(parseFloat(e.target.value))}
+                    className="w-full mx-2 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  />
+                  <span className="text-sm text-green-400 w-24 text-right">Player Advantage</span>
+                </div>
+                
+                <div className="text-center font-medium text-xs text-gray-400 mt-1">
+                  {shotsLanded === 0 
+                    ? "Both sides land equal attacks" 
+                    : shotsLanded > 0 
+                      ? `Player lands ${Math.round((1 + shotsLanded) * 100)}% attacks, enemies land 100% attacks` 
+                      : `Player lands 100% attacks, enemies land ${Math.round((1 + Math.abs(shotsLanded)) * 100)}% attacks`}
+                </div>
+              </div>
+            </div>
+            
+            {/* Battle outcome display */}
+            <div className={`rounded-xl overflow-hidden shadow-lg ${
+              battleOutcome?.result === 'victory' ? 'bg-gradient-to-br from-green-900 to-green-800' : 
+              battleOutcome?.result === 'defeat' ? 'bg-gradient-to-br from-red-900 to-red-800' : 
+              'bg-gradient-to-br from-gray-800 to-gray-700'
+            } border ${
+              battleOutcome?.result === 'victory' ? 'border-green-600' : 
+              battleOutcome?.result === 'defeat' ? 'border-red-600' : 
+              'border-gray-600'
+            }`}>
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${
+                    battleOutcome?.result === 'victory' ? 'bg-green-700' :
+                    battleOutcome?.result === 'defeat' ? 'bg-red-700' :
+                    'bg-gray-700'
+                  }`}>
+                    {battleOutcome?.result === 'victory' ? (
+                      <TrophyIcon className="w-6 h-6" />
+                    ) : battleOutcome?.result === 'defeat' ? (
+                      <XCircleIcon className="w-6 h-6" />
+                    ) : (
+                      <ClockIcon className="w-6 h-6" />
+                    )}
+                  </div>
+                  <h3 className="font-bold text-xl">Battle Prediction</h3>
+                </div>
+                
+                {battleOutcome?.result === 'waiting' ? (
+                  <div className="flex flex-col items-center py-6 text-gray-400">
+                    <Bars3Icon className="w-12 h-12 mb-4 opacity-30" />
+                    <p className="text-center">{battleOutcome.message}</p>
+                  </div>
+                ) : battleOutcome?.result === 'victory' ? (
+                  <div>
+                    <p className="font-bold text-xl text-green-300 mb-3">{battleOutcome.message}</p>
+                    <div className="bg-gray-900 bg-opacity-50 rounded-lg p-3 mb-3">
+                      <div className="text-sm text-gray-300 mb-1">Remaining Health</div>
+                      <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
+                        <div 
+                          className="bg-green-600 h-full rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ease-out"
+                          style={{width: `${battleOutcome.healthPercentage}%`}}
+                        >
+                          {battleOutcome.healthPercentage > 15 ? `${battleOutcome.healthPercentage}%` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : battleOutcome?.result === 'defeat' ? (
+                  <div>
+                    <p className="font-bold text-xl text-red-300 mb-3">{battleOutcome.message}</p>
+                    <div className="bg-gray-900 bg-opacity-50 rounded-lg p-3 mb-3 flex items-center">
+                      <div className="w-10 h-10 bg-red-900 rounded-full flex items-center justify-center mr-3">
+                        <UserGroupIcon className="w-5 h-5 text-red-200" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Remaining Enemies</div>
+                        <div className="text-lg font-bold">{battleOutcome.mobsRemaining}</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-yellow-300 font-bold text-center py-4">{battleOutcome?.message || "Prepare for battle..."}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Player and Mobs sections */}
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Player Section */}
           <div className="w-full lg:w-1/2">
             <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
@@ -535,123 +653,6 @@ function App() {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Battle Section */}
-        <div className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl border border-gray-700">
-          <div className="bg-gradient-to-r from-purple-700 via-violet-700 to-indigo-700 px-6 py-4">
-            <h2 className="text-2xl font-bold flex items-center">
-              <ScaleIcon className="w-6 h-6 mr-2" /> Battle Simulation
-            </h2>
-          </div>
-          
-          <div className="p-6">
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold text-purple-300 flex items-center">
-                  <ArrowPathIcon className="w-5 h-5 mr-2" /> Combat Accuracy
-                </h3>
-                <div className="px-3 py-1 bg-purple-800 rounded-full text-sm font-semibold">
-                  {shotsLanded === 0 
-                    ? "Equal" 
-                    : shotsLanded > 0 
-                      ? `+${Math.round(shotsLanded * 100)}% Player` 
-                      : `+${Math.round(Math.abs(shotsLanded) * 100)}% Enemies`}
-                </div>
-              </div>
-              
-              <div className="bg-gray-700 p-4 rounded-lg shadow-inner">
-                <div className="flex items-center mb-2">
-                  <span className="text-sm text-red-400 w-24">Enemy Advantage</span>
-                  <input 
-                    type="range" 
-                    min="-1" 
-                    max="1" 
-                    step="0.1" 
-                    value={shotsLanded}
-                    onChange={(e) => setShotsLanded(parseFloat(e.target.value))}
-                    className="w-full mx-2 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                  />
-                  <span className="text-sm text-green-400 w-24 text-right">Player Advantage</span>
-                </div>
-                
-                <div className="text-center font-medium text-xs text-gray-400 mt-1">
-                  {shotsLanded === 0 
-                    ? "Both sides land equal attacks" 
-                    : shotsLanded > 0 
-                      ? `Player lands ${Math.round((1 + shotsLanded) * 100)}% attacks, enemies land 100% attacks` 
-                      : `Player lands 100% attacks, enemies land ${Math.round((1 + Math.abs(shotsLanded)) * 100)}% attacks`}
-                </div>
-              </div>
-            </div>
-            
-            {/* Battle outcome display */}
-            <div className={`rounded-xl overflow-hidden shadow-lg ${
-              battleOutcome?.result === 'victory' ? 'bg-gradient-to-br from-green-900 to-green-800' : 
-              battleOutcome?.result === 'defeat' ? 'bg-gradient-to-br from-red-900 to-red-800' : 
-              'bg-gradient-to-br from-gray-800 to-gray-700'
-            } border ${
-              battleOutcome?.result === 'victory' ? 'border-green-600' : 
-              battleOutcome?.result === 'defeat' ? 'border-red-600' : 
-              'border-gray-600'
-            }`}>
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${
-                    battleOutcome?.result === 'victory' ? 'bg-green-700' :
-                    battleOutcome?.result === 'defeat' ? 'bg-red-700' :
-                    'bg-gray-700'
-                  }`}>
-                    {battleOutcome?.result === 'victory' ? (
-                      <TrophyIcon className="w-6 h-6" />
-                    ) : battleOutcome?.result === 'defeat' ? (
-                      <XCircleIcon className="w-6 h-6" />
-                    ) : (
-                      <ClockIcon className="w-6 h-6" />
-                    )}
-                  </div>
-                  <h3 className="font-bold text-xl">Battle Prediction</h3>
-                </div>
-                
-                {battleOutcome?.result === 'waiting' ? (
-                  <div className="flex flex-col items-center py-6 text-gray-400">
-                    <Bars3Icon className="w-12 h-12 mb-4 opacity-30" />
-                    <p className="text-center">{battleOutcome.message}</p>
-                  </div>
-                ) : battleOutcome?.result === 'victory' ? (
-                  <div>
-                    <p className="font-bold text-xl text-green-300 mb-3">{battleOutcome.message}</p>
-                    <div className="bg-gray-900 bg-opacity-50 rounded-lg p-3 mb-3">
-                      <div className="text-sm text-gray-300 mb-1">Remaining Health</div>
-                      <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
-                        <div 
-                          className="bg-green-600 h-full rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ease-out"
-                          style={{width: `${battleOutcome.healthPercentage}%`}}
-                        >
-                          {battleOutcome.healthPercentage > 15 ? `${battleOutcome.healthPercentage}%` : ''}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : battleOutcome?.result === 'defeat' ? (
-                  <div>
-                    <p className="font-bold text-xl text-red-300 mb-3">{battleOutcome.message}</p>
-                    <div className="bg-gray-900 bg-opacity-50 rounded-lg p-3 mb-3 flex items-center">
-                      <div className="w-10 h-10 bg-red-900 rounded-full flex items-center justify-center mr-3">
-                        <UserGroupIcon className="w-5 h-5 text-red-200" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-400">Remaining Enemies</div>
-                        <div className="text-lg font-bold">{battleOutcome.mobsRemaining}</div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-yellow-300 font-bold text-center py-4">{battleOutcome?.message || "Prepare for battle..."}</p>
-                )}
               </div>
             </div>
           </div>
